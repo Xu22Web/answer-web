@@ -109,12 +109,12 @@ const App: Component = () => {
       </div>
       <div class="px-5 py-10 flex justify-center">
         <div
-          class={`bg-white bg-opacity-50 rounded-md px-3 py-2 backdrop-blur max-w-xl w-4/5 min-w-[20rem] ${
+          class={`bg-white bg-opacity-50 rounded-md px-3 py-2 backdrop-blur max-w-xl w-4/5 min-w-[20rem] text-base ${
             loading() ? 'animate-pulse' : ''
           }`}
         >
           <div class="text-blue-500">
-            <div class="py-1 flex justify-between">
+            <div class="py-1 flex justify-between items-center h-8">
               <span class="text-white rounded-lg bg-blue-400 px-2 py-0.5 text-xs">
                 <span class="">{questionTypes[answerData().type]}</span>
                 <span class="px-1">/</span>
