@@ -147,20 +147,21 @@ const App: Component = () => {
               <span>答案：</span>
               {answerData().answers.map((answer, i, arr) => (
                 <span class="font-bold">
-                  <span class="underline">{answer}</span>
-                  <span>{i === arr.length - 1 || '，'}</span>
+                  <span class="underline break-all">{answer}</span>
+                  {i === arr.length - 1 || <span>，</span>}
                 </span>
               ))}
             </div>
             <div class="py-1">
               <span>题目：</span>
-              <span>{answerData().question}</span>
+              <span class="break-all">{answerData().question}</span>
             </div>
             <div class="pt-2 text-sm sm:text-right opacity-80">
               <span>来源：</span>
               <a
                 class="opacity-80 underline px-1 break-all"
                 href={answerData().from}
+                target="blank"
               >
                 {answerData().from}
               </a>
