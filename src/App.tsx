@@ -76,8 +76,10 @@ const handleGetAnswer = debounce(async (question: string) => {
 const handleInput = async (e: InputEvent) => {
   if (e.target) {
     const { value } = e.target as HTMLInputElement;
-    if (value) {
-      const res = await handleGetAnswer(value.trim());
+    // 问题
+    const question = value.trim();
+    if (question) {
+      const res = await handleGetAnswer(question);
       if (res) {
         setAnswerData(res);
         return;
@@ -167,6 +169,30 @@ const App: Component = () => {
               </a>
               <span>{answerData().title}</span>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-center px-5 md:py-10">
+        <div class="bg-blue-300 px-4 py-2 rounded text-white text-opacity-90 backdrop-blur max-w-xl w-4/5 min-w-[20rem] break-all text-base">
+          <div class="flex items-center">
+            <i class="overflow-hidden w-[1em] h-[1em] inline-block text-lg">
+              <svg
+                class="w-full h-full"
+                viewBox="0 0 1024 1024"
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+              >
+                <path d="M512 992C246.912 992 32 777.088 32 512 32 246.912 246.912 32 512 32c265.088 0 480 214.912 480 480 0 265.088-214.912 480-480 480zM480 256v352a32 32 0 0 0 64 0V256a32 32 0 0 0-64 0z m-16 528a48 48 0 1 0 96 0 48 48 0 0 0-96 0z"></path>
+              </svg>
+            </i>
+            <span class="pl-1 font-bold">提示</span>
+          </div>
+          <div class="opacity-90 py-2">
+            答案均来自第三方接口，在此仅做展示，如有侵权，请联系：
+            <a href="mailto:1627295329@qq.com" class="underline">
+              1627295329@qq.com
+            </a>
           </div>
         </div>
       </div>
