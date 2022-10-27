@@ -72,22 +72,6 @@ const handleGetAnswer = debounce(async (question: string) => {
   }
 }, 1000);
 
-// 处理输入
-const handleInput = async (e: InputEvent) => {
-  if (e.target) {
-    const { value } = e.target as HTMLInputElement;
-    // 问题
-    const question = value.trim();
-    if (question) {
-      const res = await handleGetAnswer(question);
-      if (res) {
-        setAnswerData(res);
-        return;
-      }
-    }
-    setAnswerData(defaultAnswerData);
-  }
-};
 /**
  * @description 处理搜索
  */
@@ -125,9 +109,8 @@ const App: Component = () => {
         <div class={`flex items-stretch ${loading() ? 'animate-pulse' : ''}`}>
           <div class="">
             <input
-              class="bg-white text-white bg-opacity-20 px-4 py-2 outline-none rounded-tl rounded-bl backdrop-blur w-1/2 max-w-md placeholder-white placeholder-opacity-75 min-w-[16rem] sm:min-w-[20rem] md:roundedmd md:min-w-[25rem] md:rounded"
+              class="bg-white text-white bg-opacity-20 px-3 py-2 outline-none rounded-tl rounded-bl backdrop-blur w-1/2 max-w-md placeholder-white placeholder-opacity-75 min-w-[17rem] sm:min-w-[20rem] md:min-w-[25rem] md:rounded"
               type="text"
-              onInput={handleInput}
               placeholder="搜索题目"
               ref={inputEle}
               disabled={loading()}
