@@ -1,5 +1,5 @@
-import { createSignal, Component } from 'solid-js';
 import axios from 'axios';
+import { Component, createSignal } from 'solid-js';
 
 // 防抖
 const debounce: <T extends any[], K>(
@@ -88,6 +88,26 @@ const handleInput = async (e: InputEvent) => {
     setAnswerData(defaultAnswerData);
   }
 };
+/**
+ * @description 处理搜索
+ */
+const handleSearch = async () => {
+  if (inputEle) {
+    const { value } = inputEle;
+    // 问题
+    const question = value.trim();
+    if (question) {
+      const res = await handleGetAnswer(question);
+      if (res) {
+        setAnswerData(res);
+        return;
+      }
+    }
+    setAnswerData(defaultAnswerData);
+  }
+};
+
+let inputEle: HTMLInputElement;
 
 // 题型
 const questionTypes = {
@@ -99,28 +119,56 @@ const questionTypes = {
 
 const App: Component = () => {
   return (
-    <div class="bg-gradient-to-b from-blue-400 h-screen">
+    <div class="bg-gradient-to-b from-blue-400 h-screen text-base">
       <div class="flex flex-col items-center pt-24 md:pt-52">
         <div class="text-4xl text-white pb-4 font-light">搜题 API</div>
-        <input
-          class="bg-white text-white bg-opacity-20 outline-none px-5 py-2 rounded backdrop-blur w-1/2 max-w-md min-w-[20rem] placeholder-white placeholder-opacity-75"
-          type="text"
-          onInput={handleInput}
-          placeholder="搜索题目"
-        />
+        <div class={`flex items-stretch ${loading() ? 'animate-pulse' : ''}`}>
+          <div class="">
+            <input
+              class="bg-white text-white bg-opacity-20 px-4 py-2 outline-none rounded-tl rounded-bl backdrop-blur w-1/2 max-w-md placeholder-white placeholder-opacity-75 min-w-[16rem] sm:min-w-[20rem] md:roundedmd md:min-w-[25rem] md:rounded"
+              type="text"
+              onInput={handleInput}
+              placeholder="搜索题目"
+              ref={inputEle}
+              disabled={loading()}
+              autofocus
+            />
+          </div>
+          <div class="p-0.5 rounded-tr rounded-br bg-white bg-opacity-20 md:p-0 md:pl-2 md:bg-transparent">
+            <button
+              type="button"
+              class=" bg-blue-400 text-white grid place-items-center h-full px-2.5 rounded active:opacity-80 md:border-2 md:border-white md:border-opacity-40 "
+              onClick={handleSearch}
+              disabled={loading()}
+            >
+              <i class="overflow-hidden w-[1em] h-[1.5rem] inline-block text-base">
+                <svg
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  class="w-full h-full"
+                >
+                  <path d="M426.666667 853.333333C191.146667 853.333333 0 662.442667 0 426.666667S191.146667 0 426.666667 0s426.666667 190.890667 426.666666 426.666667-191.146667 426.666667-426.666666 426.666666z m-4.053334-89.386666a341.333333 341.333333 0 1 0 0-682.666667 341.333333 341.333333 0 0 0 0 682.666667z"></path>
+                  <path d="M695.168 755.498667a42.666667 42.666667 0 0 1 60.330667-60.330667l256 256a42.666667 42.666667 0 0 1-60.330667 60.330667l-256-256z"></path>
+                </svg>
+              </i>
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="px-5 py-10 flex justify-center">
-        <div
-          class={`bg-white bg-opacity-50 rounded-md px-3 py-2 backdrop-blur max-w-xl w-4/5 min-w-[20rem] text-base ${
-            loading() ? 'animate-pulse' : ''
-          }`}
-        >
+      <div
+        class={`px-5 py-10 flex justify-center ${
+          loading() ? 'animate-pulse' : ''
+        }`}
+      >
+        <div class=" bg-white bg-opacity-50 rounded-md px-3 py-2 backdrop-blur max-w-xl w-4/5 min-w-[20rem]">
           <div class="text-blue-500">
             <div class="py-1 flex justify-between items-center h-8">
               <span class="text-white rounded-lg bg-blue-400 px-2 py-0.5 text-xs">
                 <span class="">{questionTypes[answerData().type]}</span>
                 <span class="px-1">/</span>
-                <span class="capitalize opacity-80">{answerData().type}</span>
+                <span class="capitalize opacity-70">{answerData().type}</span>
               </span>
               {loading() && (
                 <svg
@@ -173,9 +221,9 @@ const App: Component = () => {
         </div>
       </div>
       <div class="flex justify-center px-5 md:py-10">
-        <div class="bg-blue-300 px-4 py-2 rounded text-white text-opacity-90 backdrop-blur max-w-xl w-4/5 min-w-[20rem] break-all text-base">
+        <div class="bg-blue-400 px-4 py-2 rounded text-white backdrop-blur max-w-xl w-4/5 min-w-[20rem] break-all text-base">
           <div class="flex items-center">
-            <i class="overflow-hidden w-[1em] h-[1em] inline-block text-lg">
+            <i class="overflow-hidden w-[1em] h-[1.5rem] inline-block text-lg">
               <svg
                 class="w-full h-full"
                 viewBox="0 0 1024 1024"
@@ -188,8 +236,8 @@ const App: Component = () => {
             </i>
             <span class="pl-1 font-bold">提示</span>
           </div>
-          <div class="opacity-90 py-2">
-            答案均来自第三方接口，在此仅做展示，如有侵权，请联系：
+          <div class="py-2">
+            答案均来自整合第三方的接口，在此仅做展示，如有侵权，请联系：
             <a href="mailto:1627295329@qq.com" class="underline">
               1627295329@qq.com
             </a>
