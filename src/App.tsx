@@ -1,26 +1,5 @@
 import axios from 'axios';
 import { Component, createSignal } from 'solid-js';
-
-// 防抖
-const debounce: <T extends any[], K>(
-  callback: (...args: T) => Promise<K>,
-  delay: number
-) => (...args: T) => Promise<K> = (callback, delay) => {
-  // 定时器
-  let timer: any;
-  return function (this: any, ...args) {
-    return new Promise((resolve) => {
-      // 清除定时器
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        resolve(callback.apply(this, args));
-      }, delay);
-    });
-  };
-};
-
 // 答案数据
 type AnswerData = {
   question: string;
@@ -29,14 +8,12 @@ type AnswerData = {
   title: string;
   type: 'unknown' | 'blank' | 'choice' | 'judge';
 };
-
 // 响应数据
 type ResponseData = {
   data: AnswerData;
   errno: number;
   message: string;
 };
-
 // 默认值
 const defaultAnswerData: AnswerData = {
   question: '暂无',
@@ -45,14 +22,23 @@ const defaultAnswerData: AnswerData = {
   title: '',
   type: 'unknown',
 };
-
 // 答案数据
 const [answerData, setAnswerData] = createSignal<AnswerData>(defaultAnswerData);
 // 加载
 const [loading, setLoading] = createSignal(false);
-
+// 清除按钮显示
+const [show, setShow] = createSignal(false);
+// 输入框
+let inputEle: HTMLInputElement;
+// 题型
+const questionTypes = {
+  unknown: '未知',
+  choice: '选择',
+  blank: '填空',
+  judge: '判断',
+};
 // 获取答案
-const handleGetAnswer = debounce(async (question: string) => {
+const handleGetAnswer = async (question: string) => {
   // 加载中
   setLoading(true);
   const res = await axios.post<ResponseData>(
@@ -70,8 +56,7 @@ const handleGetAnswer = debounce(async (question: string) => {
   if (errno !== -1) {
     return data;
   }
-}, 1000);
-
+};
 /**
  * @description 处理搜索
  */
@@ -90,41 +75,89 @@ const handleSearch = async () => {
     setAnswerData(defaultAnswerData);
   }
 };
-
-let inputEle: HTMLInputElement;
-
-// 题型
-const questionTypes = {
-  unknown: '未知',
-  choice: '选择',
-  blank: '填空',
-  judge: '判断',
+/**
+ * @description 聚集
+ */
+const handleFocus = () => {
+  if (inputEle) {
+    const { value } = inputEle;
+    setShow(!!value.length);
+  }
 };
-
+/**
+ * @description 输入
+ */
+const handleInput = () => {
+  if (inputEle) {
+    const { value } = inputEle;
+    setShow(!!value.length);
+  }
+};
+/**
+ * @description 聚焦
+ */
+const handleBlur = () => {
+  // setShow(false);
+};
+/**
+ * @description 清空输入
+ */
+const handleClear = () => {
+  if (inputEle) {
+    inputEle.value = '';
+    setShow(false);
+  }
+};
+// APP
 const App: Component = () => {
   return (
-    <div class="bg-gradient-to-b from-blue-400 h-screen text-base">
+    <div class="bg-gradient-to-b from-blue-400 to-white text-base">
       <div class="flex flex-col items-center pt-24 md:pt-52">
         <div class="text-4xl text-white pb-4 font-light">搜题 API</div>
-        <div class={`flex items-stretch ${loading() ? 'animate-pulse' : ''}`}>
-          <div class="">
+        <div
+          class={`flex items-stretch ${
+            loading() ? 'animate-pulse pointer-events-none' : ''
+          }`}
+        >
+          <div class="bg-white text-white bg-opacity-20 rounded-tl rounded-bl backdrop-blur flex items-center md:rounded">
             <input
-              class="bg-white text-white bg-opacity-20 px-3 py-2 outline-none rounded-tl rounded-bl backdrop-blur w-1/2 max-w-md placeholder-white placeholder-opacity-75 min-w-[17rem] sm:min-w-[20rem] md:min-w-[25rem] md:rounded"
+              class="bg-transparent pl-3 py-2 outline-none w-1/2 max-w-md placeholder-white placeholder-opacity-75 min-w-[17rem] sm:min-w-[20rem] md:min-w-[25rem] "
               type="text"
               placeholder="搜索题目"
               ref={inputEle}
-              disabled={loading()}
               autofocus
+              onFocus={handleFocus}
+              onInput={handleInput}
+              onBlur={handleBlur}
             />
+            <button
+              type="button"
+              class={`text-white px-2 grid place-items-center h-full ${
+                show() ? 'visible' : 'invisible'
+              }`}
+              onClick={handleClear}
+            >
+              <i class="overflow-hidden w-[1em] h-[1rem] inline-block">
+                <svg
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  class="w-full h-full"
+                >
+                  <path d="M563.2 512l243.712-243.712a34.304 34.304 0 1 0-51.2-51.2L512 460.8 268.288 219.648a34.304 34.304 0 0 0-51.2 51.2L460.8 512l-241.152 243.712a34.304 34.304 0 0 0 51.2 51.2L512 563.2l243.712 243.712a34.304 34.304 0 1 0 51.2-51.2z"></path>
+                </svg>
+              </i>
+            </button>
           </div>
           <div class="p-0.5 rounded-tr rounded-br bg-white bg-opacity-20 md:p-0 md:pl-2 md:bg-transparent">
             <button
               type="button"
-              class=" bg-blue-400 text-white grid place-items-center h-full px-2.5 rounded active:opacity-80 md:border-2 md:border-white md:border-opacity-40 "
+              class="bg-blue-400 text-white grid place-items-center h-full py-0 px-2.5 rounded active:opacity-80 md:border-2 md:border-white md:border-opacity-40 outline-none"
               onClick={handleSearch}
               disabled={loading()}
             >
-              <i class="overflow-hidden w-[1em] h-[1.5rem] inline-block text-base">
+              <i class="overflow-hidden w-[1em] h-[1rem] inline-block">
                 <svg
                   viewBox="0 0 1024 1024"
                   version="1.1"
@@ -206,7 +239,7 @@ const App: Component = () => {
       <div class="flex justify-center px-5 md:py-10">
         <div class="bg-blue-400 px-4 py-2 rounded text-white backdrop-blur max-w-xl w-4/5 min-w-[20rem] break-all text-base">
           <div class="flex items-center">
-            <i class="overflow-hidden w-[1em] h-[1.5rem] inline-block text-lg">
+            <i class="overflow-hidden w-[1em] h-[1em] inline-block text-lg">
               <svg
                 class="w-full h-full"
                 viewBox="0 0 1024 1024"
