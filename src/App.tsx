@@ -42,7 +42,7 @@ const handleGetAnswer = async (question: string) => {
   // 加载中
   setLoading(true);
   const res = await axios.post<ResponseData>(
-    'https://api.answer.uu988.xyz/answer/search',
+    'https://api.answer.redfish.top/answer/search',
     JSON.stringify({ question }),
     {
       headers: {
